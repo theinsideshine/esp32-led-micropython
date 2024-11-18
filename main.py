@@ -4,34 +4,44 @@ from server import start_server_with_config
 from led import Led  # Importar la clase Led
 from config import Config  # Importar la clase Config
 
-
+# Definir estados
+IDLE = 0
+BLINKING = 1
 
 async def blink_led(led, config):
-    """Controla el parpadeo del LED alternando entre estados ON y OFF."""
-    state = True  # Estado inicial: LED encendido
-    
+    """Controla el parpadeo del LED alternando entre estados IDLE y BLINKING."""
+    state = IDLE  # Estado inicial
+
     while True:
-        # Leer el tiempo actual del parpadeo desde la configuración
-        blink_time = config.led_blink_time  # Obtener el valor actualizado de blink_time
+        if state == IDLE:
+                        
+            # Verificar si `st_test` está en True
+            if config.st_test:
+                print("st_test es True. Cambiando a estado BLINKING.")
+                state = BLINKING
+            else:
+                # Esperar brevemente antes de revisar de nuevo
+                await asyncio.sleep(0.1)
 
-        print(f"Parpadeando LED con tiempo: {blink_time} ms")
-        
-        # Controlar el estado del LED
-        if state:
-            print("LED ENCENDIDO")
-            led.on(color=(0, 255, 0))  # Encender el LED con el color verde
-        else:
-            print("LED APAGADO")
-            led.off()  # Apagar el LED
+        elif state == BLINKING:
+            print("Estado: BLINKING. Iniciando parpadeo.")
+            # Leer configuración de parpadeo
+            blink_time = config.led_blink_time
+            blink_quantity = config.led_blink_quantity
+            
+            for _ in range(blink_quantity):
+                print("LED ENCENDIDO")
+                led.on(color=(0, 255, 0))  # Encender LED en verde
+                await asyncio.sleep(blink_time / 1000.0)
 
-        # Alternar el estado
-        state = not state
-        
-        # Pausar según el tiempo configurado
-        await asyncio.sleep(blink_time / 1000.0)  # Usar el tiempo de parpadeo desde la configuración
+                print("LED APAGADO")
+                led.off()  # Apagar LED
+                await asyncio.sleep(blink_time / 1000.0)
 
-
-
+            # Reiniciar `st_test` y volver al estado IDLE
+            print("Parpadeo completado. Regresando al estado IDLE.")
+            config.st_test = False
+            state = IDLE
 
 async def main():
     # Conectar a Wi-Fi
@@ -53,9 +63,11 @@ async def main():
 # Ejecutar el script
 if __name__ == "__main__":
     try:
+        print("Iniciando.")
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Programa detenido manualmente.")
+
 
 
 

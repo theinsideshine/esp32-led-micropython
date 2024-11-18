@@ -31,6 +31,9 @@ async def handle_client_with_config(reader, writer, config):
             response = {
                 "led_blink_time": config.led_blink_time,
                 "led_blink_quantity": config.led_blink_quantity,
+                "st_mode": config.st_mode,
+                "st_test": config.st_test,          
+                
             }
             writer.write(b'HTTP/1.1 200 OK\r\n')
             writer.write(b'Content-Type: application/json\r\n\r\n')
@@ -57,6 +60,10 @@ async def handle_client_with_config(reader, writer, config):
                 config.update_config("led_blink_time", data["led_blink_time"])
             if "led_blink_quantity" in data:
                 config.update_config("led_blink_quantity", data["led_blink_quantity"])
+            if "st_mode" in data:
+                config.update_config("st_mode", data["st_mode"])
+            if "st_test" in data:
+                config.update_config("st_test", data["st_test"])
             
             # Guardar la nueva configuración en el archivo
             config.save_config()

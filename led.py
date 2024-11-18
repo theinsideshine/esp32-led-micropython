@@ -8,6 +8,7 @@ class Led:
         self.pin = machine.Pin(pin_number, machine.Pin.OUT)
         self.num_leds = num_leds
         self.leds = neopixel.NeoPixel(self.pin, self.num_leds)
+        self.off()
 
     def on(self, color=(255, 255, 255)):
         """Enciende el LED con el color especificado (RGB)."""
