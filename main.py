@@ -40,7 +40,11 @@ async def blink_led(led, config):
 
             # Reiniciar `st_test` y volver al estado IDLE
             print("Parpadeo completado. Regresando al estado IDLE.")
-            config.st_test = False
+            config.update_config("st_test", False)
+            await asyncio.sleep(0.1)  # Breve pausa para asegurar la actualización
+            print(f"Antes de recargar: st_test = {config.st_test}")
+            config.reload_config()
+            print(f"Después de recargar: st_test = {config.st_test}")
             state = IDLE
 
 async def main():

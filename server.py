@@ -101,3 +101,11 @@ async def start_server_with_config(config):
         print(f"Error al iniciar el servidor: {e}")
 
 
+'''
+{
+    "st_test": true,
+    "led_blink_quantity": 3,
+    "st_mode": 0,
+    "led_blink_time": 1000
+}
+'''
