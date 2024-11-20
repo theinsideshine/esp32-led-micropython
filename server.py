@@ -32,8 +32,8 @@ async def handle_client_with_config(reader, writer, config):
                 "led_blink_time": config.led_blink_time,
                 "led_blink_quantity": config.led_blink_quantity,
                 "st_mode": config.st_mode,
-                "st_test": config.st_test,          
-                
+                "st_test": config.st_test,
+                "led_color": config.led_color  # Agregado al response
             }
             writer.write(b'HTTP/1.1 200 OK\r\n')
             writer.write(b'Content-Type: application/json\r\n\r\n')
@@ -64,6 +64,8 @@ async def handle_client_with_config(reader, writer, config):
                 config.update_config("st_mode", data["st_mode"])
             if "st_test" in data:
                 config.update_config("st_test", data["st_test"])
+            if "led_color" in data:  # Actualizar el color del LED
+                config.update_config("led_color", data["led_color"])
             
             # Guardar la nueva configuración en el archivo
             config.save_config()
@@ -87,8 +89,6 @@ async def handle_client_with_config(reader, writer, config):
 
 # Función para iniciar el servidor con `config` inyectado
 async def start_server_with_config(config):
-    #config = Config()    
-
     async def handle_client(reader, writer):
         await handle_client_with_config(reader, writer, config)
 
@@ -106,6 +106,7 @@ async def start_server_with_config(config):
     "st_test": true,
     "led_blink_quantity": 3,
     "st_mode": 0,
-    "led_blink_time": 1000
+    "led_blink_time": 1000,
+    "led_color": "VERDE"
 }
 '''
