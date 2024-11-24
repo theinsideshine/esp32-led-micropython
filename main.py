@@ -1,8 +1,9 @@
 import uasyncio as asyncio
 from wifi import connect_wifi
 from server import start_server_with_config
-from led import Led  # Importar la clase Led
-from config import Config  # Importar la clase Config
+from led import Led  # Clase para manejar el LED
+from config import Config  # Clase para manejar la configuración
+from log import Log  # Clase del logger
 
 # Definición de los estados de la máquina de estados simulando enum
 class State:
@@ -11,88 +12,91 @@ class State:
     ST_LOOP_LED_ON = 2
     ST_LOOP_LED_OFF = 3
     ST_LOOP_END = 4
+    ST_MODE_RUN_DEMO1 = 5  # Modo adicional
+
+async def run_demo_serial_plotter(logger, led):
+    """Simulación del modo demo que imprime valores al logger."""
+    print("Ejecutando demo serial plotter...")
+    logger.msg("Iniciando demo serial plotter")
+    danger_point = 2500
+
+    for raw in range(5000):
+        filtered = raw + 500
+        state = 1 if filtered > danger_point else 0
+        logger.ctrl(raw, filtered, state, danger_point)    
+    
 
 async def led_blink_loop(led, config):
     """Máquina de estados para controlar el parpadeo del LED."""
-    st_loop = State.ST_LOOP_INIT  # Usamos la clase `State` para el estado inicial
-    led_blink_qty = 0  # Inicialización fuera del bucle
+    st_loop = State.ST_LOOP_INIT
+    led_blink_qty = 0  # Cantidad de parpadeos
+    logger = Log(uart_num=1, baudrate=115200, tx_pin=17, rx_pin=18)
+    await asyncio.sleep(0.1)  # Espera breve para inicializar UART
 
     while True:
         if st_loop == State.ST_LOOP_INIT:
-            #print("Estado: Inicializando...")
-            # Verificar si `st_test` está activo
             if config.st_test:
                 led_blink_qty = config.led_blink_quantity
                 blink_time = config.led_blink_time
                 led_color = config.led_color
                 led.set_color(led_color)
+                logger.set_level(config.log_level)
                 st_loop = State.ST_LOOP_IDLE
+            elif config.st_mode == "DEMO":
+                st_loop = State.ST_MODE_RUN_DEMO1
+                logger.set_level(config.log_level)
             else:
-                # Esperar brevemente antes de revisar de nuevo
                 await asyncio.sleep(0.1)
 
         elif st_loop == State.ST_LOOP_IDLE:
-            print(f"Preparado para parpadear {led_blink_qty} veces.")
-            print(f"Preparado para parpadear un tiempo de {blink_time} ms.")
-            print(f"Preparado para parpadear con un color de {led_color}.")
+            logger.msg(f"Preparado para parpadear {led_blink_qty} veces con {blink_time} ms.")
             st_loop = State.ST_LOOP_LED_ON
 
         elif st_loop == State.ST_LOOP_LED_ON:
-            print("Estado: LED ON")
-            led.on()  
-            await asyncio.sleep(blink_time / 1000.0)  # Convertir milisegundos a segundos
+            logger.msg("LED encendido")
+            led.on()
+            await asyncio.sleep(blink_time / 1000.0)
             st_loop = State.ST_LOOP_LED_OFF
 
         elif st_loop == State.ST_LOOP_LED_OFF:
-            print("Estado: LED OFF")
-            led.off()  # Apagar LED
+            logger.msg("LED apagado")
+            led.off()
             await asyncio.sleep(blink_time / 1000.0)
-            led_blink_qty -= 1  # Reducir la cantidad de parpadeos restantes
-            if led_blink_qty > 0:
-                st_loop = State.ST_LOOP_LED_ON
-            else:
-                st_loop = State.ST_LOOP_END
+            led_blink_qty -= 1
+            st_loop = State.ST_LOOP_LED_ON if led_blink_qty > 0 else State.ST_LOOP_END
 
         elif st_loop == State.ST_LOOP_END:
-            print("Estado: Parpadeo completado. Regresando al estado inicial.")            
+            logger.msg("Ensayo terminado")
             config.update_config("st_test", False)
-            await asyncio.sleep(0.1)  # Breve pausa para asegurar la actualización            
-            config.reload_config()    # Este va por si desde el servidor se hicieron cambios
-            print(f"Después de recargar: st_test = {config.st_test}")            
             st_loop = State.ST_LOOP_INIT
+
+        elif st_loop == State.ST_MODE_RUN_DEMO1:
+            await run_demo_serial_plotter(logger, led)
+            config.update_config("st_mode", "OFF")  # Cambiar el modo si es necesario
+            st_loop = State.ST_LOOP_INIT
+
+        await asyncio.sleep(0.1)
 
 async def main():
     # Conectar a Wi-Fi
     connect_wifi()
-    
+
     # Crear instancia de configuración
     config = Config()
-    config.initialize_config()  # Verifica y carga la configuración inicial
-    
-    # Iniciar el servidor en una tarea asíncrona y pasar `config`
+    config.initialize_config()
+
+    # Iniciar el servidor en una tarea asíncrona
     asyncio.create_task(start_server_with_config(config))
-    
-    # Crear la instancia del LED
-    led = Led(pin_number=48, num_leds=1)  # Cambiar según lo necesites
-    
-    # Iniciar la máquina de estados del LED
+
+    # Crear instancia del LED
+    led = Led(pin_number=48, num_leds=1)
+
+    # Iniciar la máquina de estados
     await led_blink_loop(led, config)
 
-# Ejecutar el script
 if __name__ == "__main__":
     try:
-        print("Iniciando.")
+        print("Iniciando sistema...")
         asyncio.run(main())
     except KeyboardInterrupt:
         print("Programa detenido manualmente.")
-
-
-
-
-
-
-
-
-
-
-       
