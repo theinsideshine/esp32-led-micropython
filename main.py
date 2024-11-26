@@ -18,11 +18,11 @@ async def run_demo_serial_plotter(logger, led):
     """Simulación del modo demo que imprime valores al logger."""
     print("Ejecutando demo serial plotter...")
     logger.msg("Iniciando demo serial plotter")
-    danger_point = 2500
+    danger_point = 50
 
-    for raw in range(5000):
-        filtered = raw + 500
-        state = 1 if filtered > danger_point else 0
+    for raw in range(100):
+        filtered = raw + 10
+        state = 10 if filtered > danger_point else 0
         logger.ctrl(raw, filtered, state, danger_point)    
     
 

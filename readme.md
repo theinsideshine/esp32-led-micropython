@@ -187,6 +187,14 @@ Configures the LED to blink 5 times with a duration of 1 second per blink.
 Enables arduino plotter logging output.
 
 
+
+
+ESP32-S3DEVKITC-1_V1.1-Test execution-Data persistence
+[![ESP32S3 - Test execution-Data persistence](images/ensayo-py.png)](https://youtu.be/4lRGovF_mIw )
+
+ESP32-S3DEVKITC-1_V1.1 - Execution modes - Logger via serial port
+[![ESP32S3 - Execution modes - Logger via serial port](images/logger-py.png)](https://youtu.be/BwDFdab-rl0)
+
 Usage
 Install Dependencies: Upload the required files (main.py, led.py, config.py, and config.json) to the ESP32 using Thonny IDE.
 Run the Code: Power on the ESP32 and access the web interface.
