@@ -187,7 +187,10 @@ Configures the LED to blink 5 times with a duration of 1 second per blink.
 Enables arduino plotter logging output.
 
 
+Problems in embedded firmware design
+[![Problems in embedded firmware design](images/embebidos.png)](https://youtu.be/KhKX23DdfLY)
 
+[Presentation](doc/embebidos.pdf)
 
 ESP32-S3DEVKITC-1_V1.1-Test execution-Data persistence
 [![ESP32S3 - Test execution-Data persistence](images/ensayo-py.png)](https://youtu.be/4lRGovF_mIw )
