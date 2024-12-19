@@ -198,6 +198,15 @@ ESP32-S3DEVKITC-1_V1.1-Test execution-Data persistence
 ESP32-S3DEVKITC-1_V1.1 - Execution modes - Logger via serial port
 [![ESP32S3 - Execution modes - Logger via serial port](images/logger-py.png)](https://youtu.be/BwDFdab-rl0)
 
+
+ESP32 - Arduino vs Micropython - 
+The main differences in the implementation of non-blocking architecture with a state machine control
+ flow between Arduino and Micropython are discussed. And why not the use of IDF.
+[![ESP32 - Arduino vs Micropython ](images/Ard-vs-Mpy.png)](https://www.youtube.com/watch?v=uNnV7amWa5Y)
+
+
+Repository: https://github.com/theinsideshine/esp32S3-led-arduino
+
 Usage
 Install Dependencies: Upload the required files (main.py, led.py, config.py, and config.json) to the ESP32 using Thonny IDE.
 Run the Code: Power on the ESP32 and access the web interface.
